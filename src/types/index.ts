@@ -1,0 +1,222 @@
+// ============================================================
+// Entidades do domínio
+// ============================================================
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
+export interface Address {
+  street?: string;
+  number?: string;
+  neighborhood?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+}
+
+export interface Person {
+  _id: string;
+  name: string;
+  cpf?: string;
+  address: Address;
+  phone?: string;
+  email?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type DebtStatus = 'active' | 'paid' | 'overdue';
+export type InstallmentStatus = 'pending' | 'paid';
+
+export interface Debt {
+  _id: string;
+  personId: Person | string;
+  description: string;
+  totalAmount: number;
+  installmentsCount: number;
+  interestRate: number;
+  dailyInterestRate: number;
+  installmentAmount: number;
+  totalWithInterest: number;
+  status: DebtStatus;
+  startDate: string;
+  endDate?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Installment {
+  _id: string;
+  debtId: string;
+  number: number;
+  dueDate: string;
+  amount: number;
+  principal?: number;
+  interestAmount?: number;
+  interestRate?: number;
+  status: InstallmentStatus;
+  paidAt?: string;
+  lateFees?: number;
+  lateDays?: number;
+  currentLateFees?: number; // calculado em tempo real pelo backend
+  currentLateDays?: number; // calculado em tempo real pelo backend
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ============================================================
+// Dashboard
+// ============================================================
+
+export interface GlobalDashboard {
+  totals: {
+    totalLent: number;
+    totalReceived: number;
+    totalInterest: number;
+    totalPending: number;
+    totalAccruedInterest: number;
+    totalUpdated: number;
+    totalPeople: number;
+    totalDebts: number;
+  };
+  debtsByStatus: {
+    active?: number;
+    paid?: number;
+    overdue?: number;
+  };
+  monthlyData: {
+    monthlyDebts: MonthlyDebt[];
+    monthlyReceived: MonthlyReceived[];
+    monthlyInterest: MonthlyInterest[];
+  };
+  upcomingInstallments: Installment[];
+}
+
+export interface MonthlyDebt {
+  _id: { year: number; month: number };
+  totalLent: number;
+  count: number;
+}
+
+export interface MonthlyReceived {
+  _id: { year: number; month: number };
+  totalReceived: number;
+}
+
+export interface MonthlyInterest {
+  _id: { year: number; month: number };
+  totalInterest: number;
+}
+
+export interface PersonDashboard {
+  totalPaid: number;
+  totalPending: number;
+  totalInterestPaid: number;
+  totalInterestPending: number;
+  totalDebts: number;
+  nextInstallments: Installment[];
+}
+
+// ============================================================
+// Score interno de pagamento (alternativa ao Serasa)
+// ============================================================
+
+export type ScoreClassification = 'Sem histórico' | 'Excelente' | 'Bom' | 'Regular' | 'Ruim' | 'Alto risco';
+
+export interface PersonScore {
+  score: number; // 0 a 1000
+  classification: ScoreClassification;
+  paymentBehavior: {
+    label: string;
+    onTimeRate: number | null; // 0 a 1
+    onTimeCount: number;
+    lateCount: number;
+    totalPaidInstallments: number;
+    averageLateDays: number;
+    overdueNowCount: number;
+  };
+  recurrence: {
+    isRecurring: boolean;
+    totalDebts: number;
+    label: string;
+    averageDaysBetweenLoans: number | null;
+  };
+}
+
+// ============================================================
+// Formulários
+// ============================================================
+
+export interface LoginForm {
+  email: string;
+  password: string;
+}
+
+export interface RegisterForm {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
+export interface PersonForm {
+  name: string;
+  cpf?: string;
+  phone?: string;
+  email?: string;
+  address?: Address;
+}
+
+export interface InstallmentOverride {
+  number: number;
+  interestAmount: number;
+}
+
+export interface DebtForm {
+  personId: string;
+  description: string;
+  totalAmount: number;
+  installmentsCount: number;
+  interestRate: number;
+  dailyInterestRate?: number;
+  startDate?: string;
+  endDate?: string;
+  installmentsOverrides?: InstallmentOverride[];
+}
+
+// ============================================================
+// Navegação
+// ============================================================
+
+export type RootStackParamList = {
+  Auth: undefined;
+  Main: undefined;
+};
+
+export type AuthStackParamList = {
+  Login: undefined;
+  Register: undefined;
+};
+
+export type MainTabParamList = {
+  Dashboard: undefined;
+  People: undefined;
+  Debts: undefined;
+  Reports: undefined;
+  More: undefined;
+};
+
+export type PeopleStackParamList = {
+  PeopleList: undefined;
+  PersonDetail: { personId: string; personName: string };
+  AddEditPerson: { personId?: string; personName?: string };
+};
+
+export type DebtsStackParamList = {
+  DebtsList: undefined;
+  DebtDetail: { debtId: string };
+  AddDebt: { personId?: string; personName?: string };
+};
