@@ -14,7 +14,7 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://manager-debts-backend.onrender.com"
+        "EXPO_PUBLIC_API_URL": "https://manager-debts-backend.vercel.app/"
       }
     },
     "production": {
